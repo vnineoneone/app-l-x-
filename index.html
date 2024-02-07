@@ -59,28 +59,54 @@
 
         #troll-image {
             display: none;
-            position: fixed;
-            /* Hiển thị hình ảnh troll full màn hình */
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            /* Đảm bảo hình ảnh không bị méo khi full màn hình */
-            z-index: 9999;
-            opacity: 0;
-            /* Ẩn ban đầu */
-            animation: zoomIn 0.5s ease forwards;
-            /* Áp dụng animation phóng to */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20%;
+            height: auto;
+            z-index: 999;
+            animation: moveTroll 5s infinite alternate, jumpAround 2s infinite;
         }
 
-        @keyframes zoomIn {
-            from {
-                transform: scale(0);
+        @keyframes moveTroll {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
             }
 
-            to {
-                transform: scale(1);
+            25% {
+                transform: translate(-50%, -50%) rotate(-15deg);
+            }
+
+            50% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+
+            75% {
+                transform: translate(-50%, -50%) rotate(15deg);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+        }
+
+        @keyframes jumpAround {
+
+            0%,
+            100% {
+                transform: translate(-50%, -50%);
+            }
+
+            25% {
+                transform: translate(-50%, -50%) translateY(-10%);
+            }
+
+            50% {
+                transform: translate(-50%, -50%) translateX(10%);
+            }
+
+            75% {
+                transform: translate(-50%, -50%) translateY(10%);
             }
         }
 
@@ -98,6 +124,7 @@
     <img id="troll-image" src="troll.jpg" alt="Troll image">
     <script>
         var shrinkCounter = 0;
+        var soundPlayed = false;
 
         function getRandomInt(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -118,8 +145,8 @@
             var maxWidth = window.innerWidth - newWidth;
             var maxHeight = window.innerHeight - newHeight;
 
-            var randomX = getRandomInt(0, maxWidth);
-            var randomY = getRandomInt(0, maxHeight);
+            var randomX = getRandomInt(newWidth / 2, maxWidth - newWidth / 2); // Ensure button stays within viewport
+            var randomY = getRandomInt(newHeight / 2, maxHeight - newHeight / 2); // Ensure button stays within viewport
 
             button.style.width = newWidth + 'px';
             button.style.height = newHeight + 'px';
@@ -131,16 +158,32 @@
             button.style.fontSize = newFontSize + 'px';
 
             shrinkCounter++;
-            console.log("Shrink count: " + shrinkCounter);
 
             if (shrinkCounter >= 5) {
                 button.style.display = 'none';
                 var trollImage = document.getElementById('troll-image');
-                trollImage.classList.add('show'); // Thêm class 'show' để hiển thị hình ảnh troll và kích hoạt animation
-                var trollSound = document.getElementById('troll-sound');
-                trollSound.play(); // Chơi âm thanh troll
+                trollImage.classList.add('show');
+                if (!soundPlayed) {
+                    var trollSound = document.getElementById('troll-sound');
+                    trollSound.play();
+                    soundPlayed = true;
+                }
             }
         }
+
+        function moveTrollRandomly() {
+            var trollImage = document.getElementById('troll-image');
+            var trollWidth = trollImage.offsetWidth;
+            var trollHeight = trollImage.offsetHeight;
+            var maxX = window.innerWidth - trollWidth;
+            var maxY = window.innerHeight - trollHeight;
+            var randomX = getRandomInt(trollWidth / 2, maxX - trollWidth / 2); // Ensure troll stays within viewport
+            var randomY = getRandomInt(trollHeight / 2, maxY - trollHeight / 2); // Ensure troll stays within viewport
+            trollImage.style.left = randomX + 'px';
+            trollImage.style.top = randomY + 'px';
+        }
+
+        setInterval(moveTrollRandomly, 3000); // Adjust the interval for desired speed
     </script>
 </body>
 
